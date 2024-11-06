@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} CALCULADORA DE FERTILIZANTES GRANULARES {% endblock %}
+
+{% block content %} 
+Este archivo contiene el proceso completo desarrollado en python para poder obtener de manera sencilla y efectiva la cantidad de fertilizantes y valor respectivo para cultivos como papa.
+Escoge el cultivo para saber la base de la cantidad de fertilizantes con el que vas a realizar el cálculo.
+{% endblock %}
+
+{% block buttons-container %}
+<button onclick="mostrarInformacion('PAPA')">PAPA</button>
+<button onclick="mostrarInformacion('PASTO')">PASTO</button>
+<button onclick="mostrarInformacion('MAIZ')">MAIZ</button>
+<button onclick="mostrarInformacion('AVENA')">AVENA</button>
+<button onclick="mostrarInformacion('OTRO')">OTRO</button>
+{% endblock %}
+

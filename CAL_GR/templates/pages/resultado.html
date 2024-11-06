@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+<h1>Nutrientes multiplicados para el cultivo seleccionado:</h1>
+<ul>
+    {% for key, value in nutrientes.items %}
+        <li>{{ key }}: {{ value }}</li>
+    {% endfor %}
+</ul>

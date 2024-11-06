@@ -1,0 +1,123 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <title> {% block title %} {% endblock %} </title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <link
+            href="{% static 'css/styles.css' %}"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand navbar-light bg-light">
+            <div class="nav navbar-nav">
+                <a class="nav-item nav-link active" href="#">INICIO</a>
+                <a class="nav-item nav-link active" href="https://agrofertilab.com.co/">AGROFERTILAB</a>
+            </div>
+            <div class="logo">
+                <a href="https://agrofertilab.com.co/"><img src="{% static 'images/logo.png' %}" alt="Logo" /></a>
+            </div>
+        </nav>
+
+        <div class="image-container">
+            <a href="#"></a><img src="{% static 'images/imgcentral.png' %}" alt="imagen con logos" /></a>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            {% block buttons-container %} {% endblock %}
+        </div>
+    
+        <div id="informacion" class="informacion"></div><br>
+
+        <div id="resultado" class="resultado"></div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+           <label for="area">Ingrese el area del cultivo (en Hectareas):</label>
+            <input type="number" name="area" id="area" required placeholder="Ej. 1.5" step="0.1"><br><br>
+    
+            <label for="cultivo">Cultivo:</label>
+            <select name="cultivo" id="cultivo">
+                <option value="papa">Papa</option>
+                <option value="pasto">Pasto</option>
+                <option value="maiz">Maiz</option>
+                <option value="avena">Avena</option>
+                <option value="otro">Otro</option>
+            </select><br><br>
+
+            <button type="submit">Calcular</button><br>
+
+        </form>
+
+        <div class="centered">
+            {% if image_data %}
+                <img src="{{ image_data }}" alt="Gráfico de Fertilizantes" />
+            {% endif %}
+        </div><br>
+
+        <p>Valor_Fertilizantes: {{ Valor_Fertilizantes }}</p><br>
+
+        <footer class="footer footer-expand footer-light bg-light">
+            <div class="container_footer">
+                <div class="row">
+                    <div class="logo_footer">
+                        <a href="https://agrofertilab.com.co/">
+                            <img src="{% static 'images/logo_footer.png' %}" alt="logo_footer">
+                        </a>
+                    </div>
+                    <div class="info_footer">
+                        <p><strong>Datos de Contacto</strong></p>
+                        <p><i class="fa fa-phone"></i> Teléfono: +57 3196477890</p>
+                        <p><i class="fa fa-envelope"></i> <a href="mailto:agrofertilab@gmail.com">agrofertilab@gmail.com</a></p>
+                        <p><i class="fa fa-map-marker-alt"></i> <a href="https://maps.google.com/maps?q=Carrera+6+%23+3-18,+Villapinzón">Carrera 6 # 3-18, Villapinzón</a></p>
+                        <p><strong>Proyecto desarrollado por AGROFERTILAB S.A.S</strong></p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            const elementos = {
+                "PAPA": "La base de cálculo para papa en kg/Ha es: Nitrógeno: 210, Fósforo: 100.0, Potasio: 350.0, Calcio: 80.0, Magnesio: 40.0, Azufre: 20.0",
+                "PASTO": "La base de cálculo para pasto en kg/Ha es: Nitrógeno: 150, Fósforo: 60, Potasio: 40, Calcio: 50, Magnesio: 20, Azufre: 20",
+                "MAIZ": "La base de cálculo para maiz en kg/Ha es: Nitrógeno: 100, Fósforo: 100, Potasio: 50, Calcio: 40, Magnesio: 20, Azufre: 10",
+                "AVENA": "La base de cálculo para avena en kg/Ha es: Nitrógeno: 150, Fósforo: 60, Potasio: 40, Calcio: 50, Magnesio: 20, Azufre: 20",
+                "OTRO": "La base de cálculo para un cultivo en general en kg/Ha es: Nitrógeno: 100, Fósforo: 100, Potasio: 100, Calcio: 100, Magnesio: 20, Azufre: 20",
+            };
+    
+            function mostrarInformacion(elemento) {
+                const infoDiv = document.getElementById('informacion');
+                infoDiv.textContent = elementos[elemento];
+            }
+
+        </script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
