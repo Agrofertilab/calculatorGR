@@ -9,7 +9,7 @@ import base64
 
 def index(request):
 
-    csv_url = 'https://raw.githubusercontent.com/Agrofertilab/Calculadora-Fertilizantes/refs/heads/main/Fertilizantes_Granulados.csv'
+    csv_url = 'https://raw.githubusercontent.com/Agrofertilab/calculatorGR/refs/heads/main/Fertilizantes_Granulados.csv'
     df = load_data_from_github(csv_url)
     # Convertir el DataFrame a HTML
 

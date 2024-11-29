@@ -1,0 +1,6 @@
+Django==5.1.2
+gekko==1.2.1
+matplotlib==3.9.2
+matplotlib-inline==0.1.7
+numpy==2.1.2
+pandas==2.2.3

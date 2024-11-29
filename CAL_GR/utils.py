@@ -34,7 +34,7 @@ def load_data_from_github(url):
 
 def run_gekko(df, resultado):
 
-    m = GEKKO(remote=True)  # Crea un modelo Gekko remoto
+    m = GEKKO(remote=False)  # Crea un modelo Gekko local
 
     # Definición de L
     L = len(df)
@@ -119,13 +119,14 @@ def plot_fertilizer_resultados(df, resultados, Valor_Fertilizantes):
                 print(f"Warning: Index {var_index} out of range for DataFrame 'df'")
 
     # Create the bar plot with different colors and units
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(10, 8))
     colors = plt.cm.get_cmap('viridis', len(fertilizers))
     plt.bar(fertilizers, values, color=colors(range(len(fertilizers))))
-    plt.xlabel("Fertilizantes", fontsize=12)
-    plt.ylabel("Cantidad (kg)", fontsize=12)  # Added 'kg' unit to y-axis label
-    plt.title("Cantidad de Fertilizantes Recomendada", fontsize=14)
-    plt.xticks(rotation=45, ha='right')
+    plt.xlabel("Fertilizantes", fontsize=14)
+    plt.ylabel("Cantidad (kg)", fontsize=14)  # Added 'kg' unit to y-axis label
+    plt.title("Cantidad de Fertilizantes Recomendada", fontsize=16)
+    plt.xticks(rotation=25, ha='right')
+    plt.subplots_adjust(top=0.85, bottom=0.2)
 
     for i, v in enumerate(values):
         plt.text(i, v, f"{round(v, 2)} kg", ha='center', va='bottom', fontsize=8)  # Added 'kg' unit to value labels
