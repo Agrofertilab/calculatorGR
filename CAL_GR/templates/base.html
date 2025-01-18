@@ -23,7 +23,7 @@
                 <a class="nav-item nav-link active" href="https://agrofertilab.com.co/">AGROFERTILAB</a>
             </div>
             <div class="logo">
-                <a href="https://agrofertilab.com.co/"><img src="{% static 'images/logo.png' %}" alt="Logo" /></a>
+                <a href="https://agrofertilab.com.co/"><img src="{% static 'images/logo_nav.png' %}" alt="logo_footer" /></a>
             </div>
         </nav>
 
@@ -68,30 +68,33 @@
 
         <div class="centered">
             {% if image_data %}
-                <img src="{{ image_data }}" alt="Gráfico de Fertilizantes" />
+                <img src="{{ image_data }}" alt="Gráfico de Fertilizantes">
             {% endif %}
+        </div><br>
+
+        <div class="table-container">
+            <div class="table">
+                {{ df_html|safe }}  <!-- Esto renderiza la tabla HTML generada -->
+            </div>
         </div><br>
 
         <p>Valor_Fertilizantes: {{ Valor_Fertilizantes }}</p><br>
 
-        <footer class="footer footer-expand footer-light bg-light">
+        <footer class="footer">
             <div class="container_footer">
-                <div class="row">
-                    <div class="logo_footer">
-                        <a href="https://agrofertilab.com.co/">
-                            <img src="{% static 'images/logo_footer.png' %}" alt="logo_footer">
-                        </a>
-                    </div>
-                    <div class="info_footer">
-                        <p><strong>Datos de Contacto</strong></p>
-                        <p><i class="fa fa-phone"></i> Teléfono: +57 3196477890</p>
-                        <p><i class="fa fa-envelope"></i> <a href="mailto:agrofertilab@gmail.com">agrofertilab@gmail.com</a></p>
-                        <p><i class="fa fa-map-marker-alt"></i> <a href="https://maps.google.com/maps?q=Carrera+6+%23+3-18,+Villapinzón">Carrera 6 # 3-18, Villapinzón</a></p>
-                        <p><strong>Proyecto desarrollado por AGROFERTILAB S.A.S</strong></p>
-                    </div>
-                </div>
+              <div class="info_footer">
+                <p><strong>Datos de Contacto</strong></p>
+                <p><i class="fa fa-phone"></i> Teléfono: +57 3196477890</p>
+                <p><i class="fa fa-envelope"></i> <a href="mailto:agrofertilab@gmail.com">agrofertilab@gmail.com</a></p>
+                <p><i class="fa fa-map-marker-alt"></i> <a href="https://maps.google.com/maps?q=Carrera+6+%23+3-18,+Villapinzón">Carrera 6 # 3-18, Villapinzón</a></p>                        <p><strong>Proyecto desarrollado por AGROFERTILAB S.A.S</strong></p>
+              </div>
+              <div class="logo_footer">
+                <a href="https://agrofertilab.com.co/">
+                  <img src="{% static 'images/logo.png' %}" alt="logo">
+                </a>
+              </div>
             </div>
-        </footer>
+          </footer>
 
         <script>
             const elementos = {

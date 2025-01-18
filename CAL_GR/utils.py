@@ -32,75 +32,69 @@ def load_data_from_github(url):
     df = pd.read_csv(io.StringIO(decoded_content))
     return df
 
-def run_gekko(df, resultado):
-
-    m = GEKKO(remote=False)  # Crea un modelo Gekko local
+# @title gekko
+def run_gekko(df, resultado, area):
+    m = GEKKO(remote=False)  # Crea un modelo Gekko remoto
 
     # Definición de L
     L = len(df)
 
-    # Define variables a partir del DataFrame
+    # Define variables de control a partir del DataFrame
     variables = {}
     for index, row in df.iterrows():
         variable_name = row['VARIABLE']
-        variables[variable_name] = m.Var(lb=0, ub=10000)
+        variables[variable_name] = m.Var(lb=0, ub=10000)  # Restricciones para las variables de fertilizantes
 
-    # Crea parámetros a partir del DataFrame
+    # Crea parámetros a partir del DataFrame (Precio de fertilizantes)
     parametros = {}
     for index, row in df.iterrows():
         nombre_parametro = f"c{index+1}"
         parametros[nombre_parametro] = m.Param(value=row['PRECIO'])
 
-    # Crea una lista para almacenar las ecuaciones
-    equations = []
-
-    # Itera sobre los nutrientes (N, P, K, etc.)
+    # Crea las ecuaciones para cada nutriente (N, P, K, etc.)
     for nutriente in ['N', 'P', 'K', 'Ca', 'Mg', 'S']:
-
-        # Crea la ecuación para cada nutriente directamente con Gekko
-        equation = 0  
+        equation = 0
         for i in range(L):
-            equation += variables[df['VARIABLE'][i]] * df[nutriente][i]  
+            equation += variables[df['VARIABLE'][i]] * df[nutriente][i]  # Nutrientes por fertilizantes
 
-        equations.append(m.Equation(equation == resultado[nutriente]))  
+        # Definir la restricción de tolerancia al error (5%)
+        error_margin = resultado[nutriente] * 0.05  # Tolerancia del 5%
+        m.Equation(equation >= resultado[nutriente] - error_margin)
+        m.Equation(equation <= resultado[nutriente] + error_margin)
 
-    # Formula de minimización
-    objective_function = 0  
+    # Formula de minimización (Costo total)
+    objective_function = 0
     for index, row in df.iterrows():
         variable_name = row['VARIABLE']
         price = row['PRECIO']
-        objective_function += variables[variable_name] * price  
+        objective_function += variables[variable_name] * price
 
-    m.Minimize(objective_function)
+    m.Minimize(objective_function)  # Minimizar el costo total de los fertilizantes
 
-    m.options.IMODE = 3
-    m.options.SOLVER = 3
-    m.solve()
+    # Configuramos la tolerancia de optimización
+    m.options.IMODE = 3  # Modo de optimización
+    m.options.SOLVER = 3  # Solucionador APOPT
+    m.options.MV_TYPE = 1  # Variables de control
+    m.options.OTOL = 1e-5  # Tolerancia de la optimización
+    m.options.MAX_ITER = 10000  # Número máximo de iteraciones
+    m.options.MAX_TIME = 10000  # Tiempo máximo para la solución
+    m.solve(disp=True)
 
     # Extraer los resultados de forma segura y eficiente
     resultados = {}
     for var_name in m._variables:
         resultados[var_name.name] = var_name.value[0]
-    
-    # Eliminar valores menores a 50
-    resultados_filtrados = {k: v for k, v in resultados.items() if v >= 50}
 
-    # Obtener el valor del objetivo
-    Valor_Fertilizantes = m.options.OBJFCNVAL
-    # Convertir a formato de dinero (ejemplo con dos decimales y el signo $)
-    Valor_Fertilizantes = "${:,.2f}".format(Valor_Fertilizantes)
+    # Filtrar los resultados eliminando valores menores a 50 y redondear a múltiplos de 50
+    resultados_filtrados = {k: round(v / 50) * 50 for k, v in resultados.items() if v >= 50}
 
-    # Crear un DataFrame con los resultados filtrados
-    resultados_df = pd.DataFrame.from_dict(resultados_filtrados, orient='index', columns=['value'])
+    # Eliminar resultados menores al filtro
+    resultados_filtrados = {k: v for k, v in resultados_filtrados.items() if v >= area * 50}
 
-    # Filtrar resultados y mapear a fertilizantes
-    Filtro = resultados_df[resultados_df['value'] != 0]
-    Filtro['fertilizante'] = Filtro.index.str[1:].astype(int) - 1
-    Filtro['fertilizante'] = Filtro['fertilizante'].map(df.set_index('VARIABLE')['FERTILIZANTE'])
 
-    return resultados_filtrados, Valor_Fertilizantes
+    return resultados_filtrados
 
-def plot_fertilizer_resultados(df, resultados, Valor_Fertilizantes):
+def plot_fertilizer_resultados(df, resultados):
 
     resultados_df = pd.DataFrame.from_dict(resultados, orient='index', columns=['value'])
 
@@ -116,7 +110,32 @@ def plot_fertilizer_resultados(df, resultados, Valor_Fertilizantes):
                 fertilizers.append(df['FERTILIZANTE'][var_index])
                 values.append(resultados[variable_name])
             else:
-                print(f"Warning: Index {var_index} out of range for DataFrame 'df'")
+                print(f"Atencion: Index {var_index} Fuera del rango de la tabla de datos 'df'")
+
+        # Filtrar el DataFrame para que solo contenga las filas donde la columna 'FERTILIZANTE' esté en la lista 'fertilizers'
+    df_filtered = df[df['FERTILIZANTE'].isin(fertilizers)]
+
+    # Seleccionar solo las columnas que necesitamos: 'FERTILIZANTE', 'MARCA', 'PRECIO'
+    df_filtered = df_filtered[['FERTILIZANTE', 'MARCA', 'PRECIO']]
+
+    # Agregar la nueva columna 'CANTIDAD KG' con los valores proporcionados en el vector 'values'
+    df_filtered['CANTIDAD KG'] = values
+
+    # Crear una nueva columna 'TOTAL' que sea el resultado de multiplicar 'PRECIO' por 'CANTIDAD KG'
+    df_filtered['TOTAL'] = df_filtered['PRECIO'] * df_filtered['CANTIDAD KG']
+
+    # Sumar la columna 'TOTAL' y almacenar el resultado en la variable 'Valor_Fertilizantes'
+    Valor_Fertilizantes = df_filtered['TOTAL'].sum()
+
+    # Formatear el valor en formato de dinero (por ejemplo, con dos decimales y símbolo de moneda)
+    Valor_Fertilizantes = "${:,.2f}".format(Valor_Fertilizantes)
+
+    # Formatear las columnas 'PRECIO' y 'TOTAL' como formato de dinero
+    df_filtered['PRECIO'] = df_filtered['PRECIO'].apply(lambda x: "${:,.2f}".format(x))
+    df_filtered['TOTAL'] = df_filtered['TOTAL'].apply(lambda x: "${:,.2f}".format(x))
+
+    # Convertir el DataFrame a formato HTML
+    df_html = df_filtered.to_html(classes='table-custom')
 
     # Create the bar plot with different colors and units
     plt.figure(figsize=(10, 8))
@@ -137,4 +156,4 @@ def plot_fertilizer_resultados(df, resultados, Valor_Fertilizantes):
     plt.close()
 
     # Retornar los datos de la imagen como bytes
-    return buffer.getvalue(), Valor_Fertilizantes  # Retornar el contenido del buffer (imagen en bytes)
+    return df_html, buffer.getvalue(), Valor_Fertilizantes  # Retornar el contenido del buffer (imagen en bytes)

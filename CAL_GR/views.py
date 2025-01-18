@@ -5,6 +5,7 @@ from . import utils
 from gekko import GEKKO
 from .utils import run_gekko, load_data_from_github 
 from .utils import multiplicar_diccionario, plot_fertilizer_resultados
+from django.shortcuts import render
 import base64
 
 def index(request):
@@ -31,17 +32,17 @@ def index(request):
             resultado = "Operación inválida"
         
         # Llamada a run_gekko
-        resultado_gekko, Valor_Fertilizantes = run_gekko(df, resultado)
+        resultado_gekko = run_gekko(df, resultado, area)
         #grafico= plot_fertilizer_resultados(df, resultado_gekko, Valor_Fertilizantes)
-        image_data, Valor_Fertilizantes = plot_fertilizer_resultados(df, resultado_gekko, Valor_Fertilizantes)
+        df_html, image_data, Valor_Fertilizantes = plot_fertilizer_resultados(df, resultado_gekko)
 
         # Convertir a base64 para incluir en el HTML
         image_data_base64 = base64.b64encode(image_data).decode('utf-8')
         image_tag = f"data:image/png;base64,{image_data_base64}"
 
         # Actualizar el contexto con el nuevo resultado
-        context = {'image_data': image_tag, 'Valor_Fertilizantes': Valor_Fertilizantes}
-        #context = {'resultado': grafico}
+        context = {'df_html': df_html, 'image_data': image_tag, 'Valor_Fertilizantes': Valor_Fertilizantes}
+   
         return render(request, 'pages/index.html', context)
     else:
         return render(request, 'pages/index.html')
